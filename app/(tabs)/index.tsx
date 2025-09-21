@@ -47,6 +47,7 @@ export default function Index() {
         placeholder="Buscar filmes..."
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor="gray"
       />
       {loading ? (
         <View style={styles.loaderContainer}>
