@@ -1,5 +1,5 @@
 import { debounce } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -21,16 +21,19 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchMovies = async (query: string) => {
+  const fetchMovies = useCallback(async (query: string) => {
     setLoading(true);
     const fetchedMovies = query
       ? await searchMovies(query)
       : await getPopularMovies();
     setMovies(fetchedMovies);
     setLoading(false);
-  };
+  }, []);
 
-  const debouncedFetchMovies = useCallback(debounce(fetchMovies, 300), []);
+  const debouncedFetchMovies = useMemo(
+    () => debounce(fetchMovies, 300),
+    [fetchMovies]
+  );
 
   useEffect(() => {
     if (searchQuery) {
@@ -38,7 +41,7 @@ export default function Index() {
     } else {
       fetchMovies(""); // Fetch popular movies when search is cleared
     }
-  }, [searchQuery, debouncedFetchMovies]);
+  }, [searchQuery, debouncedFetchMovies, fetchMovies]);
 
   return (
     <View style={styles.container}>
