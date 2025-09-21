@@ -239,6 +239,12 @@ export default function MovieDetailScreen() {
       return;
     }
 
+    const calendars = await Calendar.getCalendarsAsync(
+      Calendar.EntityTypes.EVENT
+    );
+    const calendar = calendars.find((cal) => cal.id === calendarId);
+    const calendarName = calendar ? calendar.title : "seu calendário";
+
     const eventDetails = {
       title: `Assistir: ${movie.title}`,
       startDate: selectedDate,
@@ -249,7 +255,7 @@ export default function MovieDetailScreen() {
 
     try {
       await Calendar.createEventAsync(calendarId, eventDetails);
-      alert("Lembrete criado com sucesso no seu calendário!");
+      alert(`Lembrete criado com sucesso na agenda "${calendarName}"!`);
     } catch (error) {
       console.error("Erro ao criar evento: ", error);
       alert("Ocorreu um erro ao criar o lembrete.");
