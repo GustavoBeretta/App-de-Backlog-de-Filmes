@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { getMovieDetails } from "../../services/api";
 import {
   getMovieStatus,
@@ -252,127 +253,129 @@ export default function MovieDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
+      <SafeAreaView style={styles.loaderContainer} edges={["bottom"]}>
         <ActivityIndicator size="large" color="#0000ff" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!movie) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["bottom"]}>
         <Text>Filme não encontrado.</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: movie.title }} />
-      <Image
-        source={{
-          uri: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
-        }}
-        style={styles.backdrop}
-      />
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Image
-            source={{
-              uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-            }}
-            style={styles.poster}
-          />
-        </View>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.releaseDate}>
-            Lançamento:{" "}
-            {new Date(movie.release_date).toLocaleDateString("pt-BR")}
-          </Text>
-          <Text style={styles.rating}>
-            Avaliação: {movie.vote_average.toFixed(1)} / 10
-          </Text>
-        </View>
-        <Text style={styles.overviewTitle}>Sinopse</Text>
-        <Text style={styles.overview}>{movie.overview}</Text>
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.button, status.wantToWatch && styles.buttonActive]}
-            onPress={() => handleToggleStatus("wantToWatch")}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                status.wantToWatch && styles.buttonTextActive,
-              ]}
-            >
-              Quero Assistir
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <ScrollView>
+        <Stack.Screen options={{ title: movie.title }} />
+        <Image
+          source={{
+            uri: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
+          }}
+          style={styles.backdrop}
+        />
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Image
+              source={{
+                uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+              }}
+              style={styles.poster}
+            />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.releaseDate}>
+              Lançamento:{" "}
+              {new Date(movie.release_date).toLocaleDateString("pt-BR")}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, status.watched && styles.buttonActive]}
-            onPress={() => handleToggleStatus("watched")}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                status.watched && styles.buttonTextActive,
-              ]}
-            >
-              Já Assisti
+            <Text style={styles.rating}>
+              Avaliação: {movie.vote_average.toFixed(1)} / 10
             </Text>
+          </View>
+          <Text style={styles.overviewTitle}>Sinopse</Text>
+          <Text style={styles.overview}>{movie.overview}</Text>
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={[styles.button, status.wantToWatch && styles.buttonActive]}
+              onPress={() => handleToggleStatus("wantToWatch")}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  status.wantToWatch && styles.buttonTextActive,
+                ]}
+              >
+                Quero Assistir
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, status.watched && styles.buttonActive]}
+              onPress={() => handleToggleStatus("watched")}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  status.watched && styles.buttonTextActive,
+                ]}
+              >
+                Já Assisti
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.reminderButton}
+            onPress={addReminder}
+            disabled={isCreatingEvent}
+          >
+            {isCreatingEvent ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.reminderButtonText}>Adicionar Lembrete</Text>
+            )}
           </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={styles.reminderButton}
-          onPress={addReminder}
-          disabled={isCreatingEvent}
-        >
-          {isCreatingEvent ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.reminderButtonText}>Adicionar Lembrete</Text>
-          )}
-        </TouchableOpacity>
 
-        {Platform.OS === "ios" && showIOSPicker && (
-          <Modal
-            transparent={true}
-            animationType="slide"
-            visible={showIOSPicker}
-            onRequestClose={() => setShowIOSPicker(false)}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.pickerContainer}>
-                <DateTimePicker
-                  value={date}
-                  mode="datetime"
-                  onChange={onChange}
-                  display="inline"
-                  style={styles.iosPicker}
-                  themeVariant="light"
-                />
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => setShowIOSPicker(false)}
-                  >
-                    <Text style={styles.modalButtonText}>Cancelar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={handleConfirmIOS}
-                  >
-                    <Text style={styles.modalButtonText}>Confirmar</Text>
-                  </TouchableOpacity>
+          {Platform.OS === "ios" && showIOSPicker && (
+            <Modal
+              transparent={true}
+              animationType="slide"
+              visible={showIOSPicker}
+              onRequestClose={() => setShowIOSPicker(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.pickerContainer}>
+                  <DateTimePicker
+                    value={date}
+                    mode="datetime"
+                    onChange={onChange}
+                    display="inline"
+                    style={styles.iosPicker}
+                    themeVariant="light"
+                  />
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setShowIOSPicker(false)}
+                    >
+                      <Text style={styles.modalButtonText}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={handleConfirmIOS}
+                    >
+                      <Text style={styles.modalButtonText}>Confirmar</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Modal>
-        )}
-      </View>
-    </ScrollView>
+            </Modal>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
