@@ -283,16 +283,16 @@ export default function MovieDetailScreen() {
             }}
             style={styles.poster}
           />
-          <View style={styles.headerText}>
-            <Text style={styles.title}>{movie.title}</Text>
-            <Text style={styles.releaseDate}>
-              Lançamento:{" "}
-              {new Date(movie.release_date).toLocaleDateString("pt-BR")}
-            </Text>
-            <Text style={styles.rating}>
-              Avaliação: {movie.vote_average.toFixed(1)} / 10
-            </Text>
-          </View>
+        </View>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>{movie.title}</Text>
+          <Text style={styles.releaseDate}>
+            Lançamento:{" "}
+            {new Date(movie.release_date).toLocaleDateString("pt-BR")}
+          </Text>
+          <Text style={styles.rating}>
+            Avaliação: {movie.vote_average.toFixed(1)} / 10
+          </Text>
         </View>
         <Text style={styles.overviewTitle}>Sinopse</Text>
         <Text style={styles.overview}>{movie.overview}</Text>
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    flexDirection: "row",
+    alignItems: "center",
     marginTop: -80,
   },
   poster: {
@@ -405,33 +405,24 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
   },
   headerText: {
-    flex: 1,
-    marginLeft: 16,
-    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 8,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#fff",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    color: "#000",
+    textAlign: "center",
   },
   releaseDate: {
     fontSize: 14,
-    color: "#fff",
+    color: "#000",
     marginTop: 4,
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 5,
   },
   rating: {
     fontSize: 14,
-    color: "#fff",
+    color: "#000",
     marginTop: 4,
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 5,
   },
   overviewTitle: {
     fontSize: 18,
