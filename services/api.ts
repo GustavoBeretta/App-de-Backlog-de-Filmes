@@ -50,7 +50,8 @@ export const getMovieDetails = async (id: number) => {
 
 export const getMoviesDetails = async (ids: number[]) => {
   try {
-    const requests = ids.map((id) => apiClient.get(`/movie/${id}`));
+    const validIds = ids.filter(Boolean);
+    const requests = validIds.map((id) => apiClient.get(`/movie/${id}`));
     const responses = await Promise.all(requests);
     return responses.map((response) => response.data);
   } catch (error) {

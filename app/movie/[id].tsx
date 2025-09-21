@@ -34,6 +34,7 @@ interface MovieDetails {
   release_date: string;
   vote_average: number;
   backdrop_path: string;
+  runtime: number;
 }
 
 export default function MovieDetailScreen() {
@@ -66,7 +67,7 @@ export default function MovieDetailScreen() {
 
   const handleToggleStatus = async (newStatus: MovieStatus) => {
     if (movie) {
-      await toggleMovieStatus(movie.id, newStatus);
+      await toggleMovieStatus(movie.id, newStatus, movie.runtime);
       const updatedStatus = await getMovieStatus(movie.id);
       setStatus(updatedStatus);
     }

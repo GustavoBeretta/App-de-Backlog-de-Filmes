@@ -48,20 +48,59 @@ const saveRatedMovieList = async (ratedMovies: { [key: number]: number }) => {
   }
 };
 
+export interface WatchedMovie {
+  id: number;
+  runtime: number;
+}
+
+const getWatchedMovieList = async (): Promise<WatchedMovie[]> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(WATCHED_KEY);
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
+  } catch (e) {
+    console.error("Falha ao buscar filmes assistidos do armazenamento", e);
+    return [];
+  }
+};
+
+const saveWatchedMovieList = async (movies: WatchedMovie[]) => {
+  try {
+    const jsonValue = JSON.stringify(movies);
+    await AsyncStorage.setItem(WATCHED_KEY, jsonValue);
+  } catch (e) {
+    console.error("Falha ao salvar filmes assistidos no armazenamento", e);
+  }
+};
+
 export const toggleMovieStatus = async (
   movieId: number,
-  status: MovieStatus
+  status: MovieStatus,
+  runtime?: number
 ) => {
-  const key = getStorageKey(status);
-  const currentList = await getMovieList(key);
+  if (status === "watched") {
+    const currentList = await getWatchedMovieList();
+    const movieIndex = currentList.findIndex((m) => m.id === movieId);
 
-  if (currentList.includes(movieId)) {
-    await saveMovieList(
-      key,
-      currentList.filter((id) => id !== movieId)
-    );
+    if (movieIndex > -1) {
+      currentList.splice(movieIndex, 1);
+    } else {
+      if (runtime !== undefined) {
+        currentList.push({ id: movieId, runtime: runtime || 0 });
+      }
+    }
+    await saveWatchedMovieList(currentList);
   } else {
-    await saveMovieList(key, [...currentList, movieId]);
+    const key = getStorageKey(status);
+    const currentList = await getMovieList(key);
+
+    if (currentList.includes(movieId)) {
+      await saveMovieList(
+        key,
+        currentList.filter((id) => id !== movieId)
+      );
+    } else {
+      await saveMovieList(key, [...currentList, movieId]);
+    }
   }
 };
 
@@ -72,12 +111,12 @@ export const getMovieStatus = async (
   wantToWatch: boolean;
   rating: number | null;
 }> => {
-  const watchedMovies = await getMovieList(WATCHED_KEY);
+  const watchedMovies = await getWatchedMovieList();
   const wantToWatchMovies = await getMovieList(WANT_TO_WATCH_KEY);
   const ratedMovies = await getRatedMoviesList();
 
   return {
-    watched: watchedMovies.includes(movieId),
+    watched: watchedMovies.some((m) => m.id === movieId),
     wantToWatch: wantToWatchMovies.includes(movieId),
     rating: ratedMovies[movieId] || null,
   };
@@ -86,7 +125,19 @@ export const getMovieStatus = async (
 export const getMoviesByStatus = async (
   status: MovieStatus
 ): Promise<number[]> => {
+  if (status === "watched") {
+    const watchedMovies = await getWatchedMovieList();
+    return watchedMovies.map((m) => m.id);
+  }
   return getMovieList(getStorageKey(status));
+};
+
+export const getTotalWatchedTime = async (): Promise<number> => {
+  const watchedMovies = await getWatchedMovieList();
+  return watchedMovies.reduce(
+    (total, movie) => total + (movie.runtime || 0),
+    0
+  );
 };
 
 export const saveMovieRating = async (movieId: number, rating: number) => {

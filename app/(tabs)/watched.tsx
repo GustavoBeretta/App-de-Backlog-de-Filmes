@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import MovieCard from "../../components/MovieCard";
 import { getMoviesDetails } from "../../services/api";
-import { getMoviesByStatus } from "../../services/storage";
+import { getMoviesByStatus, getTotalWatchedTime } from "../../services/storage";
 
 interface Movie {
   id: number;
@@ -20,6 +20,7 @@ interface Movie {
 export default function WatchedScreen() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalTime, setTotalTime] = useState(0);
 
   const fetchWatchedMovies = async () => {
     setLoading(true);
@@ -30,6 +31,8 @@ export default function WatchedScreen() {
     } else {
       setMovies([]);
     }
+    const time = await getTotalWatchedTime();
+    setTotalTime(time);
     setLoading(false);
   };
 
@@ -38,6 +41,12 @@ export default function WatchedScreen() {
       fetchWatchedMovies();
     }, [])
   );
+
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}min`;
+  };
 
   if (loading) {
     return (
@@ -56,13 +65,20 @@ export default function WatchedScreen() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={movies}
-          renderItem={({ item }) => <MovieCard movie={item} />}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.list}
-        />
+        <>
+          <View style={styles.totalTimeContainer}>
+            <Text style={styles.totalTimeText}>
+              Tempo total assistido: {formatTime(totalTime)}
+            </Text>
+          </View>
+          <FlatList
+            data={movies}
+            renderItem={({ item }) => <MovieCard movie={item} />}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.list}
+          />
+        </>
       )}
     </View>
   );
@@ -93,5 +109,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 8,
+  },
+  totalTimeContainer: {
+    padding: 16,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  totalTimeText: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
