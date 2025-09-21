@@ -117,7 +117,6 @@ export default function MovieDetailScreen() {
       return defaultCalendar.source;
     }
 
-    // On Android, find a writable source, prioritizing Google Calendar
     const sources = await Calendar.getSourcesAsync();
     const googleSource = sources.find(
       (source) =>
@@ -128,7 +127,6 @@ export default function MovieDetailScreen() {
       return googleSource;
     }
 
-    // Fallback for other account types or local calendars
     const writableSource = sources.find(
       (source) => source.type !== Calendar.SourceType.BIRTHDAYS
     );
@@ -144,7 +142,6 @@ export default function MovieDetailScreen() {
     );
 
     if (writableCalendars.length > 0) {
-      // Prioritize finding a Google calendar
       const googleCalendar = writableCalendars.find(
         (cal) =>
           cal.source.name?.toLowerCase() === "google" ||
@@ -155,27 +152,21 @@ export default function MovieDetailScreen() {
         return googleCalendar.id;
       }
 
-      // Fallback to primary calendar if no Google calendar is found
       const primaryCalendar = writableCalendars.find((cal) => cal.isPrimary);
       if (primaryCalendar) {
         return primaryCalendar.id;
       }
 
-      // Otherwise, return the first writable calendar
       return writableCalendars[0].id;
     }
 
-    // If no writable calendar is found, try to create one
     const source = await getDefaultCalendarSource();
     if (source) {
       return createNewCalendar(source);
     }
 
-    // As a last resort, if no source was found either,
-    // try to get sources again and create a calendar with the first one.
     const allSources = await Calendar.getSourcesAsync();
     if (allSources.length > 0) {
-      // Prefer Google source for creation
       const googleSource = allSources.find(
         (s) => s.name?.toLowerCase() === "google"
       );
@@ -202,9 +193,9 @@ export default function MovieDetailScreen() {
       });
       return newCalendarID;
     } catch (e) {
-      console.error("Failed to create calendar:", e);
+      console.error("Falha ao criar calendário:", e);
       alert(
-        "Failed to create a new calendar. Please ensure you have a calendar account set up on your device."
+        "Falha ao criar um novo calendário. Certifique-se de ter uma conta de calendário configurada no seu dispositivo."
       );
       return null;
     }

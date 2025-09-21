@@ -9,28 +9,25 @@ const getStorageKey = (status: MovieStatus) => {
   return status === "watched" ? WATCHED_KEY : WANT_TO_WATCH_KEY;
 };
 
-// Helper function to get movies from a list
 const getMovieList = async (key: string): Promise<number[]> => {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
     return jsonValue != null ? JSON.parse(jsonValue) : [];
   } catch (e) {
-    console.error("Failed to fetch movies from storage", e);
+    console.error("Falha ao buscar filmes do armazenamento", e);
     return [];
   }
 };
 
-// Helper function to save movies to a list
 const saveMovieList = async (key: string, movieIds: number[]) => {
   try {
     const jsonValue = JSON.stringify(movieIds);
     await AsyncStorage.setItem(key, jsonValue);
   } catch (e) {
-    console.error("Failed to save movies to storage", e);
+    console.error("Falha ao salvar filmes no armazenamento", e);
   }
 };
 
-// Toggles a movie's status. If it has the status, it's removed. If not, it's added.
 export const toggleMovieStatus = async (
   movieId: number,
   status: MovieStatus
@@ -39,18 +36,15 @@ export const toggleMovieStatus = async (
   const currentList = await getMovieList(key);
 
   if (currentList.includes(movieId)) {
-    // Remove from current list
     await saveMovieList(
       key,
       currentList.filter((id) => id !== movieId)
     );
   } else {
-    // Add to current list
     await saveMovieList(key, [...currentList, movieId]);
   }
 };
 
-// Checks the status of a single movie
 export const getMovieStatus = async (
   movieId: number
 ): Promise<{ watched: boolean; wantToWatch: boolean }> => {
@@ -63,7 +57,6 @@ export const getMovieStatus = async (
   };
 };
 
-// Gets all movie IDs for a given status
 export const getMoviesByStatus = async (
   status: MovieStatus
 ): Promise<number[]> => {

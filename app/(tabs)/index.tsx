@@ -39,7 +39,7 @@ export default function Index() {
     if (searchQuery) {
       debouncedFetchMovies(searchQuery);
     } else {
-      fetchMovies(""); // Fetch popular movies when search is cleared
+      fetchMovies("");
     }
   }, [searchQuery, debouncedFetchMovies, fetchMovies]);
 
