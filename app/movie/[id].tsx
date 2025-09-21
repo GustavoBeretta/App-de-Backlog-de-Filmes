@@ -351,19 +351,20 @@ export default function MovieDetailScreen() {
                   onChange={onChange}
                   display="inline"
                   style={styles.iosPicker}
+                  themeVariant="light"
                 />
                 <View style={styles.modalButtons}>
                   <TouchableOpacity
                     style={styles.modalButton}
                     onPress={() => setShowIOSPicker(false)}
                   >
-                    <Text>Cancelar</Text>
+                    <Text style={styles.modalButtonText}>Cancelar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalButton}
                     onPress={handleConfirmIOS}
                   >
-                    <Text>Confirmar</Text>
+                    <Text style={styles.modalButtonText}>Confirmar</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -503,5 +504,9 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     padding: 10,
+  },
+  modalButtonText: {
+    color: "#007bff",
+    fontSize: 16,
   },
 });
