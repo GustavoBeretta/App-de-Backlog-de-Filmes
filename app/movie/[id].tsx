@@ -433,6 +433,7 @@ const styles = StyleSheet.create({
   overview: {
     fontSize: 16,
     lineHeight: 24,
+    textAlign: "justify",
   },
   actions: {
     flexDirection: "row",
