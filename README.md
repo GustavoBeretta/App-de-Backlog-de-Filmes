@@ -10,9 +10,10 @@ O aplicativo oferece as seguintes funcionalidades:
 - **Detalhes do Filme**: Ao selecionar um filme, você pode ver seus detalhes, como sinopse, data de lançamento e pôster.
 - **Listas de Filmes**: Você pode adicionar filmes a três listas diferentes:
   - **Quero Assistir**: Filmes que você planeja ver no futuro.
-  - **Já Assisti**: Filmes que você já concluiu.
+  - **Já Assisti**: Filmes que você já concluiu, com um contador de tempo total assistido.
   - **Avaliações**: Filmes que avaliou.
 - **Persistência de Dados**: Suas listas de filmes são salvas localmente no dispositivo.
+- **Agendar momento para assistir**: Você pode escolher uma data e horário para assistir o filme e o app adicionará automaticamente na agenda do seu dispositivo.
 
 ### Implementação das Funcionalidades
 
