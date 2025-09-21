@@ -8,35 +8,50 @@ import {
   View,
 } from "react-native";
 import MovieCard from "../../components/MovieCard";
-import { getMoviesDetails } from "../../services/api";
-import { getMoviesByStatus } from "../../services/storage";
+import { getMovieDetails } from "../../services/api";
+import { getRatedMovies } from "../../services/storage";
 
 interface Movie {
   id: number;
   title: string;
   poster_path: string;
+  overview: string;
+  vote_average: number;
+  user_rating: number;
 }
 
-export default function WatchedScreen() {
+export default function RatedScreen() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchWatchedMovies = async () => {
+  const fetchRatedMovies = useCallback(async () => {
     setLoading(true);
-    const watchedMovieIds = await getMoviesByStatus("watched");
-    if (watchedMovieIds.length > 0) {
-      const fetchedMovies = await getMoviesDetails(watchedMovieIds);
-      setMovies(fetchedMovies);
+    const ratedMovies = await getRatedMovies();
+    const movieIds = Object.keys(ratedMovies);
+
+    if (movieIds.length > 0) {
+      const moviePromises = movieIds.map(async (id) => {
+        const details = await getMovieDetails(Number(id));
+        return {
+          ...details,
+          user_rating: ratedMovies[Number(id)],
+        };
+      });
+
+      const detailedMovies = await Promise.all(moviePromises);
+      detailedMovies.sort((a, b) => b.user_rating - a.user_rating);
+      setMovies(detailedMovies);
     } else {
       setMovies([]);
     }
+
     setLoading(false);
-  };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      fetchWatchedMovies();
-    }, [])
+      fetchRatedMovies();
+    }, [fetchRatedMovies])
   );
 
   if (loading) {
@@ -49,20 +64,22 @@ export default function WatchedScreen() {
 
   return (
     <View style={styles.container}>
-      {movies.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>
-            {'Você ainda não marcou nenhum filme como "Já Assisti".'}
-          </Text>
-        </View>
-      ) : (
+      {movies.length > 0 ? (
         <FlatList
           data={movies}
-          renderItem={({ item }) => <MovieCard movie={item} />}
+          renderItem={({ item }) => (
+            <MovieCard movie={item} showRating={true} />
+          )}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           contentContainerStyle={styles.list}
         />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            Você ainda não avaliou nenhum filme.
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -78,6 +95,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  list: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+  },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
@@ -88,10 +110,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     color: "#666",
-  },
-  list: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 8,
   },
 });

@@ -1,3 +1,4 @@
+import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
@@ -18,8 +19,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getMovieDetails } from "../../services/api";
 import {
+  deleteMovieRating,
   getMovieStatus,
   MovieStatus,
+  saveMovieRating,
   toggleMovieStatus,
 } from "../../services/storage";
 
@@ -37,7 +40,11 @@ export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams();
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState({ watched: false, wantToWatch: false });
+  const [status, setStatus] = useState<{
+    watched: boolean;
+    wantToWatch: boolean;
+    rating: number | null;
+  }>({ watched: false, wantToWatch: false, rating: null });
   const [date, setDate] = useState(new Date());
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [showIOSPicker, setShowIOSPicker] = useState(false);
@@ -62,6 +69,18 @@ export default function MovieDetailScreen() {
       await toggleMovieStatus(movie.id, newStatus);
       const updatedStatus = await getMovieStatus(movie.id);
       setStatus(updatedStatus);
+    }
+  };
+
+  const handleSaveRating = async (newRating: number) => {
+    if (movie) {
+      if (status.rating === newRating) {
+        await deleteMovieRating(movie.id);
+        setStatus((prevStatus) => ({ ...prevStatus, rating: null }));
+      } else {
+        await saveMovieRating(movie.id, newRating);
+        setStatus((prevStatus) => ({ ...prevStatus, rating: newRating }));
+      }
     }
   };
 
@@ -289,6 +308,29 @@ export default function MovieDetailScreen() {
           </View>
           <Text style={styles.overviewTitle}>Sinopse</Text>
           <Text style={styles.overview}>{movie.overview}</Text>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingTitle}>Sua Avaliação</Text>
+            <View style={styles.stars}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={star}
+                  onPress={() => handleSaveRating(star)}
+                >
+                  <FontAwesome
+                    name={
+                      status.rating && status.rating >= star ? "star" : "star-o"
+                    }
+                    size={32}
+                    color={
+                      status.rating && status.rating >= star
+                        ? "#f1c40f"
+                        : "#ccc"
+                    }
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
           <View style={styles.actions}>
             <TouchableOpacity
               style={[styles.button, status.wantToWatch && styles.buttonActive]}
@@ -433,6 +475,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 24,
+  },
+  ratingContainer: {
+    marginTop: 24,
+    alignItems: "center",
+  },
+  ratingTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  stars: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
   },
   button: {
     backgroundColor: "#f0f0f0",

@@ -31,6 +31,15 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="rated"
+        options={{
+          title: "Avaliações",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="star" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

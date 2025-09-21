@@ -12,27 +12,42 @@ import {
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
 
-interface MovieCardProps {
+interface Movie {
   id: number;
   title: string;
   poster_path: string;
+  user_rating?: number;
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ id, title, poster_path }) => {
+interface MovieCardProps {
+  movie: Movie;
+  showRating?: boolean;
+}
+
+const MovieCard: React.FC<MovieCardProps> = ({ movie, showRating }) => {
   const router = useRouter();
 
   const handlePress = () => {
-    router.push(`/movie/${id}`);
+    router.push(`/movie/${movie.id}`);
   };
 
   return (
     <Pressable onPress={handlePress}>
       <View style={styles.container}>
         <Image
-          source={{ uri: `https://image.tmdb.org/t/p/w500${poster_path}` }}
+          source={{
+            uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          }}
           style={styles.poster}
         />
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{movie.title}</Text>
+        {showRating && movie.user_rating && (
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingText}>
+              Sua Nota: {movie.user_rating} / 5
+            </Text>
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -49,6 +64,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    position: "relative",
   },
   poster: {
     width: "100%",
@@ -61,6 +77,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  ratingContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    borderRadius: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+  },
+  ratingText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 

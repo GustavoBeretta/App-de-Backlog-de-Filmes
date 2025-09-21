@@ -60,13 +60,7 @@ export default function WantToWatchScreen() {
       ) : (
         <FlatList
           data={movies}
-          renderItem={({ item }) => (
-            <MovieCard
-              id={item.id}
-              title={item.title}
-              poster_path={item.poster_path}
-            />
-          )}
+          renderItem={({ item }) => <MovieCard movie={item} />}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           contentContainerStyle={styles.list}
